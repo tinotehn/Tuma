@@ -1,69 +1,51 @@
 ﻿import Link from "next/link";
 
-export default function Dashboard() {
+const WA = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER; // digits only, e.g. 263771234567
+const waLink = (text: string) => (WA ? `https://wa.me/${WA}?text=${encodeURIComponent(text)}` : "#");
+
+const EXAMPLES = [
+  { lang: "English", text: "Send $20 to Tendai 0771234567" },
+  { lang: "chiShona", text: "Tumira $20 kuna Tendai 0771234567" },
+  { lang: "isiNdebele", text: "Thumela $20 kuTendai 0771234567" },
+  { lang: "English", text: "Pay tithe $50 to Grace Church" },
+  { lang: "English", text: "Pay school fees $120 to Sipho" },
+];
+
+export default function Home() {
   return (
-    <main className="min-h-screen bg-ivory p-4 pb-20 max-w-md mx-auto">
+    <main className="mx-auto min-h-screen max-w-md p-4 pb-24">
       <header className="mt-8 mb-6">
-        <p className="text-sm text-forest/60 font-sans">Good morning,</p>
-        <h1 className="text-2xl font-serif font-bold text-forest">Tendai</h1>
+        <h1 className="font-serif text-3xl tracking-[0.3em] text-forest">TUMA</h1>
+        <p className="mt-1 text-sm text-forest/60">Pay on WhatsApp. Checked before it&apos;s sent.</p>
       </header>
 
-      <section className="bg-forest rounded-[20px] p-6 text-ivory relative overflow-hidden border border-champagne/20">
-        <div className="absolute -top-10 right-0 w-32 h-32 bg-champagne/10 rounded-full blur-2xl" />
-        <p className="text-xs bg-ivory/10 inline-block px-3 py-1 rounded-full">Total Balance</p>
-        <h2 className="text-4xl font-serif mt-3">$2,450.00</h2>
-        <p className="text-xs text-ivory/60 mt-1">Available • Updated just now • + 2.4% this month</p>
-
-        <div className="flex gap-3 mt-5">
-          <button className="flex-1 bg-ivory text-forest rounded-full py-3 text-sm font-semibold">
-            + Add Money
-          </button>
-          <Link
-            href="/send/peer"
-            className="flex-1 bg-champagne text-forest rounded-full py-3 text-sm font-semibold text-center"
-          >
-            Transfer
-          </Link>
-        </div>
+      <section className="relative overflow-hidden rounded-[20px] border border-champagne/20 bg-forest p-6 text-ivory">
+        <p className="inline-block rounded-full bg-ivory/10 px-3 py-1 text-xs">Chat to pay</p>
+        <h2 className="mt-3 font-serif text-2xl">Send money, pay bills, school fees, tithes &amp; shopping</h2>
+        <p className="mt-2 text-sm text-ivory/70">TUMA reads every amount in digits <em>and</em> words, and warns you about wrong amounts or wrong people before money moves.</p>
+        <a href={waLink("Hi")} aria-disabled={!WA} className="mt-5 block rounded-full bg-champagne py-3 text-center text-sm font-semibold text-forest">
+          Open TUMA on WhatsApp
+        </a>
+        {!WA && <p className="mt-2 text-xs text-ivory/60">Set NEXT_PUBLIC_WHATSAPP_NUMBER to enable this button.</p>}
       </section>
 
-      <section className="mt-6">
-        <h3 className="font-serif text-lg text-forest mt-6 mb-3">Linked Bank Accounts</h3>
-        <div className="space-y-3">
-          <div className="bg-white rounded-2xl p-4 flex items-center justify-between border border-forest/10 shadow-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-700">
-                CBZ
-              </div>
-              <div>
-                <p className="font-semibold text-forest text-sm">CBZ Bank</p>
-                <p className="text-xs text-forest/50">4821 Zimbabwe</p>
-              </div>
-            </div>
-            <p className="font-semibold text-forest">$1,200.00</p>
-          </div>
-        </div>
-      </section>
+      <h3 className="mt-6 mb-3 font-serif text-lg text-forest">Just type it</h3>
+      <div className="divide-y divide-forest/5 rounded-2xl border border-forest/10 bg-white">
+        {EXAMPLES.map(e => (
+          <a key={e.text} href={waLink(e.text)} className="block p-4">
+            <p className="text-sm font-medium text-forest">&ldquo;{e.text}&rdquo;</p>
+            <p className="text-xs text-forest/50">{e.lang}</p>
+          </a>
+        ))}
+      </div>
 
-      <section className="mt-6">
-        <h3 className="font-serif text-lg text-forest mt-6 mb-3">Recent Activity</h3>
-        <div className="bg-white rounded-2xl border border-forest/10 divide-y divide-forest/5">
-          <div className="p-4 flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-forest">Pick n Pay</p>
-              <p className="text-xs text-forest/50">Today 10:32 am</p>
-            </div>
-            <p className="text-sm font-semibold text-red-600">-$42.50</p>
-          </div>
-          <div className="p-4 flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-forest">Econet Payroll</p>
-              <p className="text-xs text-forest/50">Yesterday • Salary</p>
-            </div>
-            <p className="text-sm font-semibold text-green-700">$1,800.00</p>
-          </div>
-        </div>
-      </section>
+      <h3 className="mt-6 mb-3 font-serif text-lg text-forest">Your account</h3>
+      <Link href="/link" className="flex items-center justify-between rounded-2xl border border-forest/10 bg-white p-4 text-sm text-forest shadow-sm">
+        <span>Choose your bank or wallet</span><span aria-hidden>→</span>
+      </Link>
+      <p className="mt-6 text-center text-[11px] text-forest/50">
+        <Link href="/privacy" className="underline">Privacy</Link> · <Link href="/terms" className="underline">Terms</Link>
+      </p>
     </main>
   );
 }

@@ -1,36 +1,59 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+# Tuma — WhatsApp-native Payments for Zimbabwe
 
-First, run the development server:
+> No app. No data. Just WhatsApp.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Zimbabwe lives on WhatsApp. Data is expensive, phone storage is low. Tuma lets anyone pay ZESA, rent, tuition, and shops INSIDE WhatsApp. No bank app needed.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**Live Demo:** wa.me/[your-number] → Type "pay 50 for ZESA"
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Why Tuma?
+- 95% of Zim internet is WhatsApp
+- SMEs can't afford bank integrations
+- EcoCash charges high, but everyone has it
+- RBZ wants audit trail — we provide it
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Stack
+- **Frontend:** Next.js 14 (App Router) + 
 
-## Learn More
+Tailwind
+- **Backend:** Next.js API Routes + Supabase (Postgres)
+- **Messaging:** WhatsApp Cloud API
+- **AI:** Gemini API (JSON parsing) + Local Fallback Parser
+- **Payments:** Paynow + EcoCash (STK Push)
 
-To learn more about Next.js, take a look at the following resources:
+### How it Works
+1. User sends WhatsApp: "pay 50 for zesa 077xxxxxx"
+2. Webhook `app/api/webhook/route.ts` receives
+3. `geminiParser.ts` → `{amount: 50, biller: "ZESA"}`
+4. If Gemini down → `fallbackParser.ts` (regex)
+5. `secureValidate.ts` checks PIN/OTP + balance + duplicate
+6. `paynow/client.ts` moves money
+7. WhatsApp receipt sent + logged to 
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`rbz_compliance_logs`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Security
+- Gemini key has ZERO access to funds. Only parses text → JSON.
+- Money movement requires user PIN/OTP + Supabase Row Level Security + Paynow token.
+- Every payment logged to `audit_logs` for RBZ.
+- Rate limiter: 5 req/min per phone.
 
-## Deploy on Vercel
+### Repo Structure
+See file tree in repo root.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Setup (for team)
+1. `git clone`
+2. `cp .env.example .env` — fill your keys (never commit .env)
+3. `npm install && npm run dev`
+4. Run SQL in `lib/supabase/schema.sql` in Supabase
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+### Team
+- Product Owner / Frontend / Zim Market: [Tino Gandawa]
+- Backend Hardening: Akanbi Ibrahim — secure validation + fallback
+
+### Compliance
+All payments exportable as CSV for RBZ audit.
+
+Built in Harare, for Harare.

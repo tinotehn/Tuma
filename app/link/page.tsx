@@ -2,6 +2,7 @@
 
 import { ArrowLeft, Check, Search, X } from "lucide-react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const ZIM_BANKS = [
   { id: "cbz", name: "CBZ Bank", logo: "CBZ", color: "#0B3D26" },
@@ -19,6 +20,7 @@ const MOBILE_MONEY = [
 ];
 
 export default function LinkInstitutionPage() {
+  const router = useRouter();
   const [search, setSearch] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -29,11 +31,27 @@ export default function LinkInstitutionPage() {
     item.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  const selectedInstitution = [...ZIM_BANKS, ...MOBILE_MONEY].find(
+    (item) => item.id === selected
+  );
+
+  const handleConnect = () => {
+    if (!selectedInstitution) return;
+    
+    // Add your connection logic here (e.g., API call or navigation)
+    alert(`Successfully initiating connection to ${selectedInstitution.name}!`);
+  };
+
   return (
     <div className="min-h-screen bg-[#F5F1EB] flex flex-col">
       <div className="bg-[#0B3D26] text-white px-6 pt-12 pb-8 rounded-b-[32px]">
         <div className="flex items-center justify-between mb-6">
-          <button className="p-2 rounded-full bg-white/10" aria-label="Back">
+          <button 
+            type="button"
+            onClick={() => router.back()}
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" 
+            aria-label="Back"
+          >
             <ArrowLeft size={20} />
           </button>
           <div className="flex items-center gap-2">
@@ -42,7 +60,12 @@ export default function LinkInstitutionPage() {
             </div>
             <span className="font-bold text-sm tracking-widest">TUMA</span>
           </div>
-          <button className="p-2 rounded-full bg-white/10" aria-label="Close">
+          <button 
+            type="button"
+            onClick={() => router.back()}
+            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors" 
+            aria-label="Close"
+          >
             <X size={20} />
           </button>
         </div>
@@ -98,7 +121,7 @@ export default function LinkInstitutionPage() {
                 key={item.id}
                 type="button"
                 onClick={() => setSelected(item.id)}
-                className={`bg-white rounded-[16px] p-3 border-2 flex flex-col items-center gap-2 shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${
+                className={`bg-white rounded-[16px] p-3 border-2 flex flex-col items-center gap-2 transition-all shadow-[0_4px_12px_rgba(0,0,0,0.04)] ${
                   selected === item.id ? "border-[#0B3D26] bg-[#0B3D26]/5" : "border-black/5"
                 }`}
               >
@@ -120,9 +143,10 @@ export default function LinkInstitutionPage() {
         <button
           type="button"
           disabled={!selected}
-          className="w-full mt-10 bg-[#0B3D26] disabled:bg-black/20 text-[#C4A669] disabled:text-black/40 font-black py-5 rounded-[24px] text-[16px] shadow-[0_8px_20px_rgba(11,61,38,0.3)] transition-all"
+          onClick={handleConnect}
+          className="w-full mt-10 bg-[#0B3D26] disabled:bg-black/20 text-[#C4A669] disabled:text-black/40 font-black py-5 rounded-[24px] text-[16px] shadow-[0_8px_20px_rgba(11,61,38,0.3)] transition-all cursor-pointer disabled:cursor-not-allowed"
         >
-          {selected ? `Connect ${[...ZIM_BANKS, ...MOBILE_MONEY].find((item) => item.id === selected)?.name ?? "Account"}` : "Select a bank"}
+          {selectedInstitution ? `Connect ${selectedInstitution.name}` : "Select a bank"}
         </button>
 
         <p className="text-center text-[11px] text-black/40 mt-4 pb-10">
